@@ -1,4 +1,5 @@
 @extends('layouts.mahasiswa')
+
 @section('content')
     <div class="container mt-5">
         <div class="card shadow-lg border-0 rounded-lg">
@@ -8,10 +9,25 @@
                     <i class="fas me-2"></i> 🏆 Ranking Pengajuan Beasiswa
                 </h4>
             </div>
-
             <!-- Body -->
             <div class="card-body">
-                @if ($hasilPengajuan->isNotEmpty())
+                @if ($pesanVerifikasi)
+                    <!-- Tampilkan pesan jika pengajuan belum diverifikasi -->
+                    <div class="alert alert-warning text-center" role="alert">
+                        {{ $pesanVerifikasi }}
+                    </div>
+                @endif
+
+                @if (isset($hasilPengajuan) && $hasilPengajuan->isNotEmpty())
+                    <!-- Informasi Jumlah Penerima dan Minimal Skor -->
+                    @if ($penerimaanBeasiswa)
+                        <div class="alert alert-info text-center" role="alert">
+                            <strong>Informasi Penerimaan:</strong><br>
+                            Jumlah Penerima: {{ $penerimaanBeasiswa->jumlah_penerima }}<br>
+                            Minimal Skor: {{ number_format($penerimaanBeasiswa->minimal_skor, 2) }}
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="bg-light">
@@ -27,7 +43,7 @@
                                     <tr>
                                         <!-- Ranking -->
                                         <td class="text-center fw-bold">
-                                            <span class="badge bg-primary text-white">{{ $hasilPengajuan->firstItem() + $index }}</span>
+                                            <span class="badge bg-primary text-white">{{ $loop->iteration }}</span>
                                         </td>
                                         <!-- Nama -->
                                         <td>
@@ -56,16 +72,13 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $hasilPengajuan->links('pagination::bootstrap-5') }}
-                    </div>
                 @else
                     <!-- Empty State -->
                     <div class="text-center py-5">
-                        <img src="{{ asset('images/empty_state.png') }}" alt="Data Kosong" class="img-fluid mb-3" style="max-width: 180px;">
-                        <h5 class="text-muted fw-bold">Belum Ada Data Pengajuan Beasiswa</h5>
+                        <img src="{{ asset('images/empty_state.png') }}" alt="Data Kosong" class="img-fluid mb-3"
+                            style="max-width: 180px;">
+                        <h5 class="text-muted fw-bold">Data Pengajuan Beasiswa Masih Diproses Oleh Admin Mohon Bersabar
+                            Menunggu Proses Verifikasi Selesai</h5>
                         <p class="text-muted">
                             Silakan tunggu hingga proses pengajuan selesai diproses.
                         </p>

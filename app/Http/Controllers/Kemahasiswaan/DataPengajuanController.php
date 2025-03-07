@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kemahasiswaan;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanBeasiswa;
+use App\Models\PenerimaanBeasiswa;
 use App\Models\HasilPengajuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -93,6 +94,9 @@ class DataPengajuanController extends Controller
             $ajuan->skor = $skor;
             $dataPengajuan[] = $ajuan;
 
+            // Tambahkan status verifikasi
+            $ajuan->verifikasi = $ajuan->verifikasi ?? 0; // Default 0 jika belum ada
+
             Log::info("Status wajib lolos: " . ($ajuan->wajib_lolos ? 'Ya' : 'Tidak'));
         }
 
@@ -110,13 +114,43 @@ class DataPengajuanController extends Controller
         return view('pages.kemahasiswaan.data-pengajuan.index', ['dataPengajuan' => $dataPengajuan]);
     }
 
+    public function verifikasi(Request $request, $id, $fileType)
+    {
+        $pengajuan = PengajuanBeasiswa::findOrFail($id);
+
+        // Tentukan kolom berdasarkan fileType
+        $column = "verifikasi_" . strtolower($fileType);
+
+        // Ambil nilai action dari request
+        $action = $request->input('action');
+
+        // Ubah status verifikasi berdasarkan action
+        if ($action === 'accept') {
+            $pengajuan->$column = 2; // Diterima
+        } elseif ($action === 'reject') {
+            $pengajuan->$column = 1; // Ditolak
+        }
+
+        $pengajuan->save();
+
+        return redirect()
+            ->route('kemahasiswaan.data-pengajuan.show', $id)
+            ->with('success', "Status verifikasi file '{$fileType}' berhasil diperbarui.");
+    }
+
     /**
      * Menampilkan halaman penetapan penerimaan beasiswa.
      */
     public function showTetapkan()
     {
-        // Ambil semua data pengajuan dengan relasi pengajuan dan pengaju
+        // Ambil semua data pengajuan dengan relasi pengajuan dan pengaju, hanya yang sudah diverifikasi
         $dataPengajuan = HasilPengajuan::with(['pengajuan.pengaju'])
+            ->whereHas('pengajuan', function ($query) {
+                $query->where('verifikasi_dtks', 2) // Verifikasi DTKS diterima
+                    ->where('verifikasi_p3ke', 2) // Verifikasi P3KE diterima
+                    ->where('verifikasi_kip', 2) // Verifikasi KIP diterima
+                    ->where('verifikasi_kks', 2); // Verifikasi KKS diterima
+            })
             ->orderByDesc('skor')
             ->get();
 
@@ -128,12 +162,35 @@ class DataPengajuanController extends Controller
      */
     public function tetapkanPenerimaan(Request $request)
     {
-        $jumlahPenerima = $request->input('jumlah_penerima'); // Ambil jumlah penerima dari input form
+        // Ambil jumlah penerima dan minimal skor dari input form
+        $jumlahPenerima = $request->input('jumlah_penerima'); // Jumlah penerima
+        $minimalSkor = $request->input('minimal_skor'); // Minimal skor kelulusan
 
-        // Ambil semua data pengajuan dengan join ke tabel pengajuan_beasiswa
+        // Validasi input
+        if ($jumlahPenerima <= 0 || $minimalSkor < 0) {
+            return redirect()->route('kemahasiswaan.data-pengajuan.index')->with('error', 'Input tidak valid.');
+        }
+
+        // Simpan atau perbarui data ke tabel penerimaan_beasiswa
+        PenerimaanBeasiswa::updateOrCreate(
+            ['id' => 1], // Asumsi hanya ada satu baris data (id = 1)
+            [
+                'jumlah_penerima' => $jumlahPenerima,
+                'minimal_skor' => $minimalSkor,
+            ]
+        );
+
+        // Ambil semua data pengajuan dengan join ke tabel pengajuan_beasiswa, hanya yang sudah diverifikasi
         $pengajuan = HasilPengajuan::select('hasil_pengajuan.*')
             ->leftJoin('pengajuan_beasiswa', 'hasil_pengajuan.id_pengajuan_beasiswa', '=', 'pengajuan_beasiswa.id')
             ->with('pengajuan') // Memuat relasi pengajuan
+            ->whereHas('pengajuan', function ($query) {
+                $query->where('verifikasi_dtks', 2) // Verifikasi DTKS diterima
+                    ->where('verifikasi_p3ke', 2) // Verifikasi P3KE diterima
+                    ->where('verifikasi_kip', 2) // Verifikasi KIP diterima
+                    ->where('verifikasi_kks', 2); // Verifikasi KKS diterima
+            })
+            ->where('hasil_pengajuan.skor', '>=', $minimalSkor) // Filter berdasarkan minimal skor
             ->orderByRaw('CASE WHEN pengajuan_beasiswa.nomor_kip = "5" AND pengajuan_beasiswa.status_dtks = "5" THEN 0 ELSE 1 END')
             ->orderByDesc('hasil_pengajuan.skor')
             ->get();
@@ -142,12 +199,18 @@ class DataPengajuanController extends Controller
         foreach ($pengajuan as $index => $hasil) {
             // Tambahkan logika wajib lolos
             $wajibLolos = ($hasil->pengajuan->nomor_kip == "5" && $hasil->pengajuan->status_dtks == "5");
-
             // Tetapkan status penerimaan
             $status = ($index < $jumlahPenerima || $wajibLolos) ? 'Diterima' : 'Tidak Diterima';
-
             $hasil->update(['status_penerimaan' => $status]);
         }
+
+        // Update status penerimaan untuk pengajuan yang tidak memenuhi minimal skor
+        HasilPengajuan::whereHas('pengajuan', function ($query) {
+            $query->where('verifikasi_dtks', 2) // Verifikasi DTKS diterima
+                ->where('verifikasi_p3ke', 2) // Verifikasi P3KE diterima
+                ->where('verifikasi_kip', 2) // Verifikasi KIP diterima
+                ->where('verifikasi_kks', 2); // Verifikasi KKS diterima
+        })->where('skor', '<', $minimalSkor)->update(['status_penerimaan' => 'Tidak Diterima']);
 
         return redirect()->route('kemahasiswaan.data-pengajuan.index')->with('success', 'Keputusan penerimaan telah ditetapkan.');
     }

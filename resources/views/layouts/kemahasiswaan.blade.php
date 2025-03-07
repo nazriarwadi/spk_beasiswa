@@ -70,7 +70,7 @@
             <li class="nav-item {{ request()->routeIs('kemahasiswaan.data-beasiswa.*') ? 'active' : '' }}">
                 <a class="nav-link py-2" href="{{ route('kemahasiswaan.data-beasiswa.index') }}">
                     <i class="fas fa-fw fa-file"></i>
-                    <span style="font-size: 16px">Data Beasiswa</span></a>
+                    <span style="font-size: 16px">Informasi Beasiswa</span></a>
             </li>
             <li class="nav-item {{ request()->routeIs('kemahasiswaan.data-pengajuan.*') ? 'active' : '' }}">
                 <a class="nav-link py-2" href="{{ route('kemahasiswaan.data-pengajuan.index') }}">
@@ -189,10 +189,6 @@
         $(document).ready(function() {
             // $('table ').DataTable()
             $('table').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'csv'
-                ]
             });
         })
     </script>

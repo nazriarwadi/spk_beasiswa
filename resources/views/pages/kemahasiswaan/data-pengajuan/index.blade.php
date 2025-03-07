@@ -29,7 +29,7 @@
                                 <th>Status Ibu</th>
                                 <th>Pekerjaan Ibu</th>
                                 <th>Jumlah Tanggungan</th>
-                                <th>Skor</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,33 +180,28 @@
                                             @case(5)
                                                 > 5 Orang
                                             @break
-                                    
+
                                             @case(4)
                                                 3 - 5 Orang
                                             @break
-                                    
+
                                             @case(3)
-                                                < 3 Orang
-                                            @break
-                                    
-                                            @default
-                                                Tidak diketahui
-                                        @endswitch
-                                    </th>                                    
-                                    <td>{{ number_format($item->skor, 2) }}</td>
+                                    < 3 Orang @break @default Tidak diketahui @endswitch </th>
                                 <td>
-                                    <a href="{{ route('kemahasiswaan.data-pengajuan.show', $item->id) }}" class="btn btn-info">
+                                    <a href="{{ route('kemahasiswaan.data-pengajuan.show', $item->id) }}"
+                                        class="btn btn-info">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                
-                                    <form action="{{ route('kemahasiswaan.data-pengajuan.destroy', $item->id) }}" method="post" style="display:inline;">
+
+                                    <form action="{{ route('kemahasiswaan.data-pengajuan.destroy', $item->id) }}"
+                                        method="post" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-danger">
                                             <i class="fas fa-fw fa-trash"></i>
                                         </button>
                                     </form>
-                                </td>                                
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

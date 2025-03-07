@@ -14,7 +14,8 @@
 
                             {{-- Status DTKS --}}
                             <div class="form-group">
-                                <label class="form-label" style="color: black; font-weight: bold">Status DTKS</label>
+                                <label class="form-label" style="color: black; font-weight: bold">Status DTKS <span
+                                        class="text-danger">*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="status_dtks" value="5">
                                     <label class="form-check-label">Terdata</label>
@@ -25,7 +26,7 @@
                                 </div>
 
                                 {{-- Upload File --}}
-                                <label class="mt-2">Upload File Bukti DTKS</label>
+                                <label class="mt-2">Upload File Bukti DTKS <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="file_status_dtks"
                                     accept=".jpg,.png,.pdf,.doc,.docx"
                                     onchange="previewFile('file_status_dtks', 'preview_status_dtks')">
@@ -36,7 +37,8 @@
 
                             {{-- Status P3KE --}}
                             <div class="form-group">
-                                <label class="form-label" style="color: black; font-weight: bold">Status P3KE</label>
+                                <label class="form-label" style="color: black; font-weight: bold">Status P3KE <span
+                                        class="text-danger">*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="status_p3ke" id="desil1"
                                         value="5">
@@ -67,7 +69,7 @@
                                 </div>
 
                                 {{-- Upload File --}}
-                                <label class="mt-2">Upload File Bukti P3KE</label>
+                                <label class="mt-2">Upload File Bukti P3KE <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="file_status_p3ke"
                                     accept=".jpg,.png,.pdf,.doc,.docx"
                                     onchange="previewFile('file_status_p3ke', 'preview_status_p3ke')">
@@ -78,7 +80,8 @@
 
                             {{-- Nomor KIP --}}
                             <div class="form-group">
-                                <label class="form-label" style="color: black; font-weight: bold">Nomor KIP</label>
+                                <label class="form-label" style="color: black; font-weight: bold">Nomor KIP <span
+                                        class="text-danger">*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="nomor_kip" value="5">
                                     <label class="form-check-label">Terdata</label>
@@ -89,7 +92,7 @@
                                 </div>
 
                                 {{-- Upload File --}}
-                                <label class="mt-2">Upload File Bukti KIP</label>
+                                <label class="mt-2">Upload File Bukti KIP <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="file_nomor_kip"
                                     accept=".jpg,.png,.pdf,.doc,.docx"
                                     onchange="previewFile('file_nomor_kip', 'preview_nomor_kip')">
@@ -100,7 +103,8 @@
 
                             {{-- Nomor KKS --}}
                             <div class="form-group">
-                                <label class="form-label" style="color: black; font-weight: bold">Nomor KKS</label>
+                                <label class="form-label" style="color: black; font-weight: bold">Nomor KKS<span
+                                        class="text-danger">*</span></label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="nomor_kks" value="5">
                                     <label class="form-check-label">Terdata</label>
@@ -111,7 +115,7 @@
                                 </div>
 
                                 {{-- Upload File --}}
-                                <label class="mt-2">Upload File Bukti KKS</label>
+                                <label class="mt-2">Upload File Bukti KKS<span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="file_nomor_kks"
                                     accept=".jpg,.png,.pdf,.doc,.docx"
                                     onchange="previewFile('file_nomor_kks', 'preview_nomor_kks')">
